@@ -46,7 +46,7 @@
         function matrix() {
             // Fade out by erasing, not by blending. This way it actually reaches 0% with no accumulation.
             matrixContext.globalCompositeOperation = "destination-out";
-            matrixContext.fillStyle = "rgba(0, 0, 0, 0.15)";
+            matrixContext.fillStyle = "rgba(0, 0, 0, 0.16)";
             matrixContext.fillRect(0, 0, width, height);
             matrixContext.globalCompositeOperation = "source-over";
 
