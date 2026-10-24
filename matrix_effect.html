@@ -44,7 +44,7 @@
         const yPosition = Array(columns).fill(0);
 
         function matrix() {   // Painting the canvas background with black but on a really low opacity, just 1 as value, and these paintings are gonna stack and very progressively hidding the one underneath
-            matrixContext.fillStyle = "rgba(0, 0, 0, 0.6)";
+            matrixContext.fillStyle = "rgba(0, 0, 0, 0.08)";
             matrixContext.fillRect(0, 0, width, height);
             // Choosing the green color for the emerging appearing chars and setting a font
             matrixContext.fillStyle = "#0f0";
@@ -55,8 +55,13 @@
                 const x = index * 20;
                 matrixContext.fillText(text, x, y);
                 // Now, if y position is > 100 the cursor returns on 0
-                if (y > 100 + Math.random() * 10000)
+                if (y > 100 + Math.random() * 10000) {
+                    // Clear this column completely when it resets to avoid ghosting
+                    matrixContext.fillStyle = "#000";
+                    matrixContext.fillRect(x, 0, 20, height);
+                    matrixContext.fillStyle = "#0f0";
                     yPosition[index] = 0;
+                }
                 else // otherwise, it increments by 20
                     yPosition[index] = y + 20;
             });
