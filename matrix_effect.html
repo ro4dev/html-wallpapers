@@ -42,27 +42,50 @@
         // Setting 20 columns and all y positions on 0
         const columns = Math.floor(width / 20) + 1;
         const yPosition = Array(columns).fill(0);
+        // Each column keeps its own trail: every char stores its glyph, its y and its own opacity
+        const trails = Array.from({ length: columns }, () => []);
+        // Same fade speed as the original 0.08 overlay: each frame multiplies opacity by 0.92
+        const fadeFactor = 0.92;
+        // Once a char drops below this opacity it is removed from the trail, so it truly reaches 0
+        const minAlpha = 0.02;
 
         function matrix() {
-            // Fade out by erasing, not by blending. This way it actually reaches 0% with no accumulation.
-            matrixContext.globalCompositeOperation = "destination-out";
-            matrixContext.fillStyle = "rgba(0, 0, 0, 0.2)";
+            // Full clear every frame, the trail is rebuilt from the stored opacities
+            matrixContext.fillStyle = "#000";
             matrixContext.fillRect(0, 0, width, height);
-            matrixContext.globalCompositeOperation = "source-over";
-
-            // Draw green characters
-            matrixContext.fillStyle = "#0f0";
             matrixContext.font = "15pt monospace";
 
-            yPosition.forEach((y, index) => {
-                const text = String.fromCharCode(Math.random() * 128);
+            for (let index = 0; index < columns; index++) {
+                const trail = trails[index];
                 const x = index * 20;
-                matrixContext.fillText(text, x, y);
+
+                // Fade and draw the existing chars of this column
+                let write = 0;
+                for (let i = 0; i < trail.length; i++) {
+                    const item = trail[i];
+                    item.alpha *= fadeFactor;
+                    if (item.alpha < minAlpha) continue; // drop it for good
+                    trail[write++] = item;
+                    matrixContext.fillStyle = "rgba(0, 255, 0, " + item.alpha + ")";
+                    matrixContext.fillText(item.char, x, item.y);
+                }
+                trail.length = write;
+
+                // Draw the new char at the head of the column
+                let y = yPosition[index];
+                if (y > -20 && y < height + 20) {
+                    const char = String.fromCharCode(Math.random() * 128);
+                    trail.push({ char: char, y: y, alpha: 1 });
+                    matrixContext.fillStyle = "#0f0";
+                    matrixContext.fillText(char, x, y);
+                }
+
+                // Advance the head, resetting at a random point like the original
                 if (y > 100 + Math.random() * 10000)
                     yPosition[index] = 0;
                 else
                     yPosition[index] = y + 20;
-            });
+            }
         }
         // Finally, setting the matrix function to execute every 50 milliseconds in a loop
         setInterval(matrix, 50);
