@@ -54,14 +54,15 @@
                 const text = String.fromCharCode(Math.random() * 128);
                 const x = index * 20;
                 matrixContext.fillText(text, x, y);
-                // Reset when it goes off screen and clear that column to avoid ghosting
-                if (y > height) {
+                // Now, if y position is > 100 the cursor returns on 0 with random delay
+                if (y > 100 + Math.random() * 10000) {
+                    // Clear this column completely when it resets to avoid ghosting
                     matrixContext.fillStyle = "#000";
                     matrixContext.fillRect(x, 0, 20, height);
                     matrixContext.fillStyle = "#0f0";
                     yPosition[index] = 0;
                 }
-                else
+                else // otherwise, it increments by 20
                     yPosition[index] = y + 20;
             });
         }
