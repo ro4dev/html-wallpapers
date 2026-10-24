@@ -55,13 +55,8 @@
                 const x = index * 20;
                 matrixContext.fillText(text, x, y);
                 // Now, if y position is > 100 the cursor returns on 0
-                if (y > 100 + Math.random() * 10000) {
-                    // Clear only the old trail in this column to kill ghosting without affecting rhythm
-                    matrixContext.fillStyle = "#000";
-                    matrixContext.fillRect(x, 0, 20, y);
-                    matrixContext.fillStyle = "#0f0";
+                if (y > 100 + Math.random() * 10000)
                     yPosition[index] = 0;
-                }
                 else // otherwise, it increments by 20
                     yPosition[index] = y + 20;
             });
