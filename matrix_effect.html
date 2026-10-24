@@ -40,12 +40,12 @@
         matrixContext.font = fontSize + "pt monospace";
 
         const columns = Math.floor(width / 20) + 1;
-        const trailLength = 25;
+        const trailLength = 35;
 
         // Each column stores: head position (in rows) and when to reset
         const drops = Array(columns).fill(0).map(() => ({
-            row: 0,
-            resetAt: 100 + Math.random() * 10000 / 20
+            row: Math.floor(Math.random() * 50),
+            resetAt: 5 + Math.random() * 500
         }));
 
         function matrix() {
