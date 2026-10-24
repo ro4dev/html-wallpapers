@@ -44,7 +44,7 @@
         const yPosition = Array(columns).fill(0);
 
         function matrix() {   // Painting the canvas background with black but on a really low opacity, just 1 as value, and these paintings are gonna stack and very progressively hidding the one underneath
-            matrixContext.fillStyle = "#0001";
+            matrixContext.fillStyle = "rgba(0, 0, 0, 0.05)";
             matrixContext.fillRect(0, 0, width, height);
             // Choosing the green color for the emerging appearing chars and setting a font
             matrixContext.fillStyle = "#0f0";
