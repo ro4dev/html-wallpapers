@@ -43,21 +43,24 @@
         const columns = Math.floor(width / 20) + 1;
         const yPosition = Array(columns).fill(0);
 
-        function matrix() {   // Painting the canvas background with black but on a really low opacity, just 1 as value, and these paintings are gonna stack and very progressively hidding the one underneath
-            matrixContext.fillStyle = "#0001";
+        function matrix() {
+            // Fade out by erasing, not by blending. This way it actually reaches 0% with no accumulation.
+            matrixContext.globalCompositeOperation = "destination-out";
+            matrixContext.fillStyle = "rgba(0, 0, 0, 0.08)";
             matrixContext.fillRect(0, 0, width, height);
-            // Choosing the green color for the emerging appearing chars and setting a font
+            matrixContext.globalCompositeOperation = "source-over";
+
+            // Draw green characters
             matrixContext.fillStyle = "#0f0";
             matrixContext.font = "15pt monospace";
 
-            yPosition.forEach((y, index) => {   // For every 'y' position of every column, generate a random char and set it on the right spot
+            yPosition.forEach((y, index) => {
                 const text = String.fromCharCode(Math.random() * 128);
                 const x = index * 20;
                 matrixContext.fillText(text, x, y);
-                // Now, if y position is > 100 the cursor returns on 0
                 if (y > 100 + Math.random() * 10000)
                     yPosition[index] = 0;
-                else // otherwise, it increments by 20
+                else
                     yPosition[index] = y + 20;
             });
         }
