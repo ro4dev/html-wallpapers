@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Efecto Matrix (ES)</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="matrixCodeSpace"> </canvas>
+    <script type="text/javascript">
+        // Getting the canvas from the html and also the context
+        const matrixCodeSpace = document.getElementById("matrixCodeSpace");
+        const matrixContext = matrixCodeSpace.getContext("2d");
+        // Setting the canvas width same as the page width
+        matrixCodeSpace.width = window.innerWidth;
+        matrixCodeSpace.height = window.innerHeight;
+        // Getting the canvas width and height to now work with them from now on
+        const width = matrixCodeSpace.width;
+        const height = matrixCodeSpace.height;
+        // Filling the background with pure black
+        matrixContext.fillStyle = "#000";
+        matrixContext.fillRect(0, 0, width, height);
+        // Setting 20 columns and all y positions on 0
+        const columns = Math.floor(width / 20) + 1;
+        const yPosition = Array(columns).fill(0);
+        // Each column keeps its own trail: every char stores its glyph, its y and its own opacity
+        const trails = Array.from({ length: columns }, () => []);
+        // Same fade speed as the original 0.08 overlay: each frame multiplies opacity by 0.92
+        const fadeFactor = 0.92;
+        // Once a char drops below this opacity it is removed from the trail, so it truly reaches 0
+        const minAlpha = 0.02;
+        // Spanish glyphs only: lowercase, uppercase, accents, diaeresis, enye and digits
+        const charset = (
+            "abcdefghijklmnopqrstuvwxyz" +
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+            "ñÑáéíóúüÁÉÍÓÚÜ" +
+            "0123456789"
+        ).split("");
+
+        function matrix() {
+            // Full clear every frame, the trail is rebuilt from the stored opacities
+            matrixContext.fillStyle = "#000";
+            matrixContext.fillRect(0, 0, width, height);
+            matrixContext.font = "15pt monospace";
+
+            for (let index = 0; index < columns; index++) {
+                const trail = trails[index];
+                const x = index * 20;
+
+                // Fade and draw the existing chars of this column
+                let write = 0;
+                for (let i = 0; i < trail.length; i++) {
+                    const item = trail[i];
+                    item.alpha *= fadeFactor;
+                    if (item.alpha < minAlpha) continue; // drop it for good
+                    trail[write++] = item;
+                    matrixContext.fillStyle = "rgba(0, 255, 0, " + item.alpha + ")";
+                    matrixContext.fillText(item.char, x, item.y);
+                }
+                trail.length = write;
+
+                // Draw the new char at the head of the column
+                let y = yPosition[index];
+                if (y > -20 && y < height + 20) {
+                    const char = charset[Math.floor(Math.random() * charset.length)];
+                    trail.push({ char: char, y: y, alpha: 1 });
+                    matrixContext.fillStyle = "#0f0";
+                    matrixContext.fillText(char, x, y);
+                }
+
+                // Advance the head, resetting at a random point like the original
+                if (y > 100 + Math.random() * 10000)
+                    yPosition[index] = 0;
+                else
+                    yPosition[index] = y + 20;
+            }
+        }
+        // Finally, setting the matrix function to execute every 50 milliseconds in a loop
+        setInterval(matrix, 50);
+    </script>
+</body>
+
+</html>
